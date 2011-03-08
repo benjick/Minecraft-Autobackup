@@ -2,7 +2,7 @@ Minecraft Server AutoBackup for Linux
 by Justin Smith
 forked by Max Malm
 
-Features
+Features 
 
 * Autobackup using the systems built in crontab and tar archiver.
 * Autosaves before backup.
