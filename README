@@ -2,7 +2,7 @@ Minecraft Server AutoBackup for Linux
 by Justin Smith
 forked by Max Malm
 
-Features 
+Features
 
 * Autobackup using the systems built in crontab and tar archiver.
 * Autosaves before backup.
@@ -29,7 +29,7 @@ Config Settings
 * UPDATEMINS=<n> - This is how often (in minutes) you want the script to do backups. Hourly = 60, Daily = 1440.
 * OLDBACKUPS=<n> - This will tell the script how old the backups must be before removal. Default is 3 days.
 * LOGIT=<n> - This will Enable/Disable the scripts logging. Enabled it will tell what it is doing step by step. Disabled it will do quiet execution. (Enabling this is recommended when debugging)
-* SCP=<n> - 1 enables SCP to remote host, 0 disables it.
+* SCP=<n> - 1 enables SCP to remote host, 0 disables it. You will need to set up key-based auth between the hosts (see http://www.hostingrails.com/HowTo-SSH-SCP-without-a-password).
 * SCPUSERNAME="<s>" - Username to use for remote host.
 * SCPHOST="<s>" - Hostname to use for remote host.
 * SCPPORT="<s>" - Post to use for remote host.
