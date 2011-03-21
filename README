@@ -2,6 +2,14 @@ Minecraft Server AutoBackup for Linux
 by Justin Smith
 forked by Max Malm
 
+Since you need to run you server in a screen, start it like this (or similar)
+
+Vanilla:
+screen -S minecraft java -Xmx2048M -Xms2048M -jar minecraft_server.jar nogui
+
+Bukkit:
+screen -S minecraft java -Xmx2048M -Xms2048M -jar craftbukkit.jar nogui
+
 Features
 
 * Autobackup using the systems built in crontab and tar archiver.
