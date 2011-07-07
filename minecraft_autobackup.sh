@@ -3,6 +3,7 @@
 #	http://www.minecraftforum.net/viewtopic.php?f=10&t=36066
 # Modified by Max Malm to support save-on / save-off while doing backup and auto-scp to remote host
 #	https://github.com/benjick/Minecraft-Autobackup
+# Modified again by Ian M to backup all worlds
 
 #Variables
 
@@ -109,43 +110,22 @@ then
 fi
 OLDBACKUP=`find $PWD/$BACKUPDIR -type d -mtime +$OLDBACKUPS | grep -v -x "$PWD/$BACKUPDIR" | xargs rm -rf`
 
-# --Check for dependencies--
+#Backing up levels: world, world_skylands, world_nether, dungeon
 
-#Is this system Linux?
-#LOL just kidding, at least it better be...
+echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: world to tar file: $FINALDIR/world.$STAMP.tar.gz"
+CMD_WORLD="tar -czf $FINALDIR/world.$STAMP.tar.gz world"
 
-#Get level-name
-if [ $LOGIT -eq 1 ]
-then
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Fetching Level Name.."
-fi
+echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: world_skylands to tar file: $FINALDIR/world_skylands.$STAMP.tar.gz"
+CMD_WORLD_SKYLANDS="tar -czf $FINALDIR/world_skylands.$STAMP.tar.gz world_skylands"
 
-while read line
-do
-   VARI=`echo $line | cut -d= -f1`
-   if [ "$VARI" == "level-name" ]
-   then
-      WORLD=`echo $line | cut -d= -f2`
-   fi
-done < "$PROPFILE"
+echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: world_nether to tar file: $FINALDIR/world_nether.$STAMP.tar.gz"
+CMD_WORLD_NETHER="tar -czf $FINALDIR/world_nether.$STAMP.tar.gz world_nether"
 
-if [ $LOGIT -eq 1 ]
-then
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Level-Name is $WORLD"
-fi
+echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: dungeon to tar file: $FINALDIR/dungeon.$STAMP.tar.gz"
+CMD_DUNGEON="tar -czf $FINALDIR/dungeon.$STAMP.tar.gz dungeon"
 
-BFILE="$WORLD.$STAMP.tar.gz"
-CMD="tar -czf $FINALDIR/$BFILE $WORLD"
 
-if [ $LOGIT -eq 1 ]
-then
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: $WORLD to tar file: $FINALDIR/$BFILE"
-fi
-
-if [ $NOTIFY -eq 1 ]
-then
-   screen -x $SCREENNAME -X stuff "`printf "say Backing up world: \'$WORLD\'\r"`"
-fi
+screen -x $SCREENNAME -X stuff "`printf "say Backing up world: \'world\'\r"`"
 
 #Create timedated backup and create the backup directory if need.
 if [ $AUTOSAVE -eq 1 ]
@@ -161,19 +141,39 @@ fi
 
 if [ $NOTIFY -eq 1 ]
 then
-   screen -x $SCREENNAME -X stuff "`printf "say Packing and compressing world...\r"`"
+   screen -x $SCREENNAME -X stuff "`printf "say Packing and compressing worlds...\r"`"
 fi
 
 # Run backup command
 screen -x $SCREENNAME -X stuff "`printf "save-off\r"`"
-$CMD
+$CMD_WORLD
 screen -x $SCREENNAME -X stuff "`printf "save-on\r"`"
+
+# Run backup command
+screen -x $SCREENNAME -X stuff "`printf "save-off\r"`"
+$CMD_WORLD_SKYLANDS
+screen -x $SCREENNAME -X stuff "`printf "save-on\r"`"
+
+# Run backup command
+screen -x $SCREENNAME -X stuff "`printf "save-off\r"`"
+$CMD_WORLD_NETHER
+screen -x $SCREENNAME -X stuff "`printf "save-on\r"`"
+
+# Run backup command
+screen -x $SCREENNAME -X stuff "`printf "save-off\r"`"
+$CMD_DUNGEON
+screen -x $SCREENNAME -X stuff "`printf "save-on\r"`"
+
+
 
 # Transfer files via SCP to remote host
 if [ $SCP -eq 1 ]
 then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Sending files to remote host via SCP"
-   scp -P $SCPPORT $FINALDIR/$BFILE $SCPUSERNAME@$SCPHOST:$SCPPATH
+   scp -P $SCPPORT $FINALDIR/world.$STAMP.tar.gz world $SCPUSERNAME@$SCPHOST:$SCPPATH
+   scp -P $SCPPORT $FINALDIR/world_skylands.$STAMP.tar.gz world_skylands $SCPUSERNAME@$SCPHOST:$SCPPATH
+   scp -P $SCPPORT $FINALDIR/world_nether.$STAMP.tar.gz world_nether $SCPUSERNAME@$SCPHOST:$SCPPATH
+   scp -P $SCPPORT $FINALDIR/dungeon.$STAMP.tar.gz dungeon $SCPUSERNAME@$SCPHOST:$SCPPATH
 fi
 
 if [ $NOTIFY -eq 1 ]
