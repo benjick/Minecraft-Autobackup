@@ -61,7 +61,7 @@ if [ -d "$FINALDIR" ]
 then
    echo -n < /dev/null
 else
-   mkdir "$FINALDIR"
+   mkdir -p "$FINALDIR"
    
    if [ $LOGIT -eq 1 ]
    then
