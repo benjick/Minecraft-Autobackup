@@ -37,7 +37,7 @@ then
 fi
 
 BACKUPDATE=`date +%Y-%m-%d`
-FINALDIR="$BACKUPDIR/$BACKUPDATE"
+FINALDIR="$BACKUPDIR/$BACKUPDATE/${STAMP}"
 
 if [ $LOGIT -eq 1 ]
 then
@@ -95,11 +95,11 @@ then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Level-Name is $WORLD"
 fi
 
-BFILE="${STAMP}/$WORLD.tar.gz"
+BFILE="$WORLD.tar.gz"
 CMD="tar -czf $FINALDIR/$BFILE $WORLD"
-BFILEN="${STAMP}/${WORLD}_nether.tar.gz"
+BFILEN="${WORLD}_nether.tar.gz"
 CMDN="tar -czf $FINALDIR/$BFILEN ${WORLD}_nether"
-BFILEE="${STAMP}/${WORLD}_the_end.tar.gz"
+BFILEE="${WORLD}_the_end.tar.gz"
 CMDE="tar -czf $FINALDIR/$BFILEE ${WORLD}_the_end"
 
 if [ $LOGIT -eq 1 ]
