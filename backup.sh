@@ -4,7 +4,7 @@
 #Variables
 
 # DateTime stamp format that is used in the tar file names.
-STAMP=`date +%Y-%m-%d_%H%M`
+STAMP=`date +%H%M`
 
 # The screen session name, this is so the script knows where to send the save-all command (for autosave)
 SCREENNAME="minecraft"
@@ -95,11 +95,11 @@ then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Level-Name is $WORLD"
 fi
 
-BFILE="$WORLD.$STAMP.tar.gz"
+BFILE="${STAMP}/$WORLD.tar.gz"
 CMD="tar -czf $FINALDIR/$BFILE $WORLD"
-BFILEN="${WORLD}_nether.$STAMP.tar.gz"
+BFILEN="${STAMP}/${WORLD}_nether.tar.gz"
 CMDN="tar -czf $FINALDIR/$BFILEN ${WORLD}_nether"
-BFILEE="${WORLD}_the_end.$STAMP.tar.gz"
+BFILEE="${STAMP}/${WORLD}_the_end.tar.gz"
 CMDE="tar -czf $FINALDIR/$BFILEE ${WORLD}_the_end"
 
 if [ $LOGIT -eq 1 ]
