@@ -105,7 +105,7 @@ fi
 # Deletes backups that are 'n' days old
 if [ $LOGIT -eq 1 ]
 then
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Removing backups older than 3 days."
+   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Removing backups older than $OLDBACKUPS days."
 fi
 OLDBACKUP=`find $PWD/$BACKUPDIR -type d -mtime +$OLDBACKUPS | grep -v -x "$PWD/$BACKUPDIR" | xargs rm -rf`
 
