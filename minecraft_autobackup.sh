@@ -69,7 +69,7 @@ then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Working in directory: $PWD."
 fi
 
-BACKUPDATE=`date +%d-%m-%Y`
+# BACKUPDATE=`date +%d-%m-%Y`
 FINALDIR="$BACKUPDIR"
 
 if [ $LOGIT -eq 1 ]
@@ -114,7 +114,7 @@ then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Removing backups older than $OLDBACKUPS hours."
 fi
 ((OLDBACKUPMINS=OLDBACKUPS*60))
-OLDBACKUPCMD=`find $PWD/$BACKUPDIR/$BACKUPDATE -type f -mmin +$OLDBACKUPMINS -delete`
+OLDBACKUPCMD=`find $PWD/$BACKUPDIR -type f -mmin +$OLDBACKUPMINS -delete`
 
 # --Check for dependencies--
 
