@@ -10,7 +10,7 @@
 STAMP=`date +%d-%m-%Y_%H%M%S`
 
 # The screen session name, this is so the script knows where to send the save-all command (for autosave)
-SCREENNAME="minecraft"
+SCREENNAME="ftb"
 
 # Whether the script should tell your server to save before backup (requires the server to be running in a screen $
 AUTOSAVE=1
@@ -33,8 +33,14 @@ MAILTO="mail@adress.com"
 # Update every 'n' Minutes
 UPDATEMINS=60
 
-# Delete backups older than 'n' DAYS
-OLDBACKUPS=7
+# Delete backups older than 'n' HOURS
+OLDBACKUPS=6
+
+#S3 Bucket Name
+BUCKET="mcbackups"
+
+#S3 Bucket Folder
+BUCKETFOLDER="tars"
 
 # Enable SCP to remote host
 SCP=0
@@ -63,8 +69,8 @@ then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Working in directory: $PWD."
 fi
 
-BACKUPDATE=`date +%d-%m-%Y`
-FINALDIR="$BACKUPDIR/$BACKUPDATE"
+# BACKUPDATE=`date +%d-%m-%Y`
+FINALDIR="$BACKUPDIR"
 
 if [ $LOGIT -eq 1 ]
 then
@@ -102,12 +108,13 @@ then
    OLDBACKUPS=3
 fi
 
-# Deletes backups that are 'n' days old
+# Deletes backups that are 'n' hours old
 if [ $LOGIT -eq 1 ]
 then
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Removing backups older than 3 days."
+   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Removing backups older than $OLDBACKUPS hours."
 fi
-OLDBACKUP=`find $PWD/$BACKUPDIR -type d -mtime +$OLDBACKUPS | grep -v -x "$PWD/$BACKUPDIR" | xargs rm -rf`
+((OLDBACKUPMINS=OLDBACKUPS*60))
+OLDBACKUPCMD=`find $PWD/$BACKUPDIR -type f -mmin +$OLDBACKUPMINS -delete`
 
 # --Check for dependencies--
 
@@ -136,6 +143,7 @@ fi
 
 BFILE="$WORLD.$STAMP.tar.gz"
 CMD="tar -czf $FINALDIR/$BFILE $WORLD"
+S3CMD="s3cmd put $FINALDIR/$BFILE s3://$BUCKET/$BUCKETFOLDER/$BFILE"
 BFILEN="${WORLD}_nether.$STAMP.tar.gz"
 CMDN="tar -czf $FINALDIR/$BFILEN ${WORLD}_nether"
 BFILEE="${WORLD}_the_end.$STAMP.tar.gz"
@@ -144,8 +152,8 @@ CMDE="tar -czf $FINALDIR/$BFILEE ${WORLD}_the_end"
 if [ $LOGIT -eq 1 ]
 then
    echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: $WORLD to tar file: $FINALDIR/$BFILE"
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: ${WORLD}_nether to tar file: $FINALDIR/$BFILEN"
-   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: ${WORLD}_the_end to tar file: $FINALDIR/$BFILEE"
+#   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: ${WORLD}_nether to tar file: $FINALDIR/$BFILEN"
+#   echo "$(date +"%G-%m-%d %H:%M:%S") [LOG] Packing and compressing folder: ${WORLD}_the_end to tar file: $FINALDIR/$BFILEE"
 fi
 
 if [ $NOTIFY -eq 1 ]
@@ -172,10 +180,12 @@ fi
 
 # Run backup command
 screen -x $SCREENNAME -X stuff "`printf "save-off\r"`"
+$OLDBACKUPCMD
 $CMD
-$CMDN
-$CMDE
+# $CMDN
+# $CMDE
 screen -x $SCREENNAME -X stuff "`printf "save-on\r"`"
+$S3CMD
 
 # Transfer files via SCP to remote host
 if [ $SCP -eq 1 ]
